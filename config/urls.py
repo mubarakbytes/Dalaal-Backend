@@ -108,5 +108,11 @@ urlpatterns = [
     path('api/features/', feature_views.feature_flags_all, name='feature_flags'),
 ]
 
-# Always serve media files (for development and production)
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+from django.urls import re_path
+from django.views.static import serve
+
+urlpatterns += [
+    re_path(r'^media/(?P<path>.*)$', serve, {
+        'document_root': settings.MEDIA_ROOT,
+    }),
+]
