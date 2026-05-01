@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reject Verification - {{ profile.user.username }}</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        .content {
+            padding: 30px;
+        }
+        .agent-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #dc3545;
+        }
+        .agent-info h3 {
+            margin: 0 0 10px 0;
+            color: #333;
+        }
+        .agent-info p {
+            margin: 5px 0;
+            color: #666;
+        }
+        .agent-info strong {
+            color: #333;
+        }
+        .form-group {
+            margin-bottom: 25px;
+        }
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #333;
+        }
+        textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            min-height: 120px;
+            resize: vertical;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+        textarea:focus {
+            outline: none;
+            border-color: #dc3545;
+        }
+        .help-text {
+            font-size: 13px;
+            color: #666;
+            margin-top: 5px;
+        }
+        .actions {
+            display: flex;
+            gap: 15px;
+        }
+        .btn {
+            flex: 1;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+        .btn-reject {
+            background: #dc3545;
+            color: white;
+        }
+        .btn-reject:hover {
+            background: #c82333;
+        }
+        .btn-cancel {
+            background: #6c757d;
+            color: white;
+        }
+        .btn-cancel:hover {
+            background: #5a6268;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 25px;
+            color: #856404;
+        }
+        .warning strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>❌ Reject Verification</h1>
+        </div>
+        <div class="content">
+            <div class="agent-info">
+                <h3>👤 Agent Details</h3>
+                <p><strong>Username:</strong> {{ profile.user.username }}</p>
+                <p><strong>Email:</strong> {{ profile.user.email }}</p>
+                <p><strong>Full Name:</strong> {{ profile.full_name|default:"Not provided" }}</p>
+                <p><strong>City:</strong> {{ profile.city|default:"Not provided" }}</p>
+                <p><strong>Submitted:</strong> {{ profile.verification_submitted_at|date:"F d, Y H:i" }}</p>
+            </div>
+            
+            {% if profile.nira_id_image %}
+            <div class="agent-info" style="border-left-color: #28a745;">
+                <h3>🖼️ Submitted Document</h3>
+                <p><a href="{{ profile.nira_id_image.url }}" target="_blank" style="color: #28a745; font-weight: 600;">📎 View Uploaded Document</a></p>
+            </div>
+            {% endif %}
+            
+            <div class="warning">
+                <strong>⚠️ Warning</strong>
+                This will reject the agent's verification request. They will receive a message in their inbox explaining why they were rejected. Make sure to provide a clear reason.
+            </div>
+            
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="rejection_reason">📝 Rejection Reason *</label>
+                    <textarea 
+                        id="rejection_reason" 
+                        name="rejection_reason" 
+                        placeholder="Enter the reason why this verification is being rejected...
+
+Example: 'The uploaded ID is blurry. Please upload a clearer image of your National ID card.'
+or
+'The ID number on the document does not match your registered phone number.'"
+                        required
+                    ></textarea>
+                    <p class="help-text">This message will be sent to the agent in their inbox. Be clear and helpful.</p>
+                </div>
+                
+                <div class="actions">
+                    <a href="{% url 'admin:users_profile_changelist' %}" class="btn btn-cancel">Cancel</a>
+                    <button type="submit" class="btn btn-reject">❌ Reject Verification</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
